@@ -27,13 +27,6 @@ def urlTolist():
             allCodeList.append(item)
     return allCodeList
 
-def writeToCSV(result, fileName):
-    with open(fileName+'.csv','w') as csvfile:
-        writer = csv.writer(csvfile,dialect='excel')
-        for row in result:
-            writer.writerow(row)
-
-
 
 
 def getHistoryData(code,time):
@@ -57,11 +50,3 @@ for p in period:
         if p == 'D':
             df.to_csv('./day/'+ code + '.csv')
         print(code,p," is Done!")
-#print(len(original_code))
-#print('[CODE:',original_code[0],']\n',getHistoryData(original_code[0],'M'))
-#df = getHistoryData(original_code[0],'M')
-#df.to_csv(original_code[0] + '.csv')
-#print(his_data[0])
-#writeToCSV(his_data,original_code[0])
-#a = numpy.asarray(his_data)
-#numpy.savetxt("out.csv",a,delimiter=",")
