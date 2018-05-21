@@ -19,7 +19,7 @@ def urlTolist():
     pat = re.compile(s)
     code = pat.findall(html)
     for item in code:
-        # 6 with 上海A股， 3 with 创业板， 0 with 深圳A股 总共3633只A股
+        # 6 with 上海A股， 3 with 创业板， 0 with 深圳A股 总共3639只A股
         if item[0] == '6' or item[0] == '3' or item[0] == '0':
             allCodeList.append(item)
     return allCodeList
