@@ -4,13 +4,12 @@ from urllib.request import urlopen
 import re
 import sys
 from bs4 import BeautifulSoup
-import ssl
-import tushare as ts
 import json
 import pandas as pd
 import numpy as np
 import os
-
+import datetime
+import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -62,8 +61,14 @@ def scrapy_sse(url):
 
     return df2.T
 
+now = datetime.datetime.now()
+year = datetime.datetime.now().year
+month = datetime.datetime.now().month
+day = datetime.datetime.now().day 
 begin_date = input('Begin-date(ex.20180101):')
-end_date = input('End-date(20180522):')
+end_date = input('End-date(ex.{}{}{}):'.format(year,month,day))
+
+
 url1 = "http://query.sse.com.cn/commonSoaQuery.do?&jsonCallBack=jsonpCallback79971&isPagination=true&updateDate="+begin_date+"&updateDateEnd="+end_date+"&sqlId=FW_HGT_JSHDBL&order=validDate%7Cdesc&pageHelp.cacheSize=1&pageHelp.beginPage=1&pageHelp.pageSize=25&pageHelp.pageNo=1&_=1526976338264"
 url2 = "http://query.sse.com.cn/commonSoaQuery.do?&jsonCallBack=jsonpCallback69374&isPagination=true&updateDate="+begin_date+"&updateDateEnd="+end_date+"&&sqlId=FW_HGT_JSHDBL&order=validDate%7Cdesc&pageHelp.cacheSize=1&pageHelp.beginPage=2&pageHelp.pageSize=25&pageHelp.pageNo=2&pageHelp.endPage=21&_=1526976338265"
 url3 = "http://query.sse.com.cn/commonSoaQuery.do?&jsonCallBack=jsonpCallback45515&isPagination=true&updateDate="+begin_date+"&updateDateEnd="+end_date+"&&sqlId=FW_HGT_JSHDBL&order=validDate%7Cdesc&pageHelp.cacheSize=1&pageHelp.beginPage=3&pageHelp.pageSize=25&pageHelp.pageNo=3&pageHelp.endPage=31&_=1526976338266"
