@@ -29,6 +29,7 @@ ax3.plot(df2[['Basis Ratio']],linewidth=1.0)
 plt.title('Basis Ratio').set_fontsize(fontsize = 15)
 
 print(df2)
-
+plt.savefig('./Basis of IF00.CFE.png')
 plt.show()
+
 
