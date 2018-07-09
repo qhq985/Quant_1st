@@ -10,7 +10,7 @@ import numpy as numpy
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches 
 import datetime 
-
+import numpy.linalg as la   # Linear Algebra
 
 
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -128,18 +128,40 @@ def candle_plot(quotes, sec):   # quotes:Matket_data-Dateframe type    sec：tit
     ax2.legend(loc='upper right')
     return fig
 
+def winsorize(factor,p,data): 
+    '''Using Quantile to delete the extreme''' 
+    data = data.sort_values(factor)    #Rank by factor, from small to large?
+    data['rank'] = range(len(data))    
+    #down_limit,upper_limit = round(len(data)*p),round(len(data)*(1-p))  #Delete extremeing processing's quantile point
+    data.loc[:round(len(data)*p),factor] = list(data[factor])[round(len(data)*p)]  
+    #winsorize is using associate quantile to replace the value out of quantile, not just delete
+    data.loc[round(len(data)*(1-p)):,factor] = list(data[factor])[round(len(data)*(1-p))]
+    return data
 
+def neutral(data,factor):  
+    '''Industry neutrality'''
+    data_med = pd.get_dummies(data,columns=['INDUSTRY_SW'],drop_first=True)   
+    # Generating virtual variables for the industry partition;  Delete the first column is deleted to avoid multiple collinear industry sw
+    n = len(data['INDUSTRY_SW'].unique())    #Check how many industry types we have and make sure how much virtual variables we need to create
+    X = np.array(data_med[data_med.columns[-(n-1):]])    #Industry virtual variables are independent variables
+    y = np.array(data[factor])   # factors are independent variables
+    if la.matrix_rank(X.T.dot(X)) == (n-1):    #  If the matrix is full order
+        beta_ols = la.inv(X.T.dot(X)).dot(X.T).dot(y)   #Regression parameter estimation
+        residual = y - X.dot(beta_ols)      #Calculating residual error, it is the value of removing industry influence factors
+    else:
+        residual = y   #If inverse is not exist, just use the original value
+    return residual
 
+# # 20180601 Getting code from Eastern Finance web and download the data from tushare.......................
 # original_code = urlTolist()
 # download_data(['M','W','D'],original_code)
-
 # print(input_indicator())
 
-data = ts.get_h_data("600519",start='2018-01-01') # 前复权
-data = data.drop(['volume'],axis=1)
-sqjt = ts.get_hist_data('600519',start = '2008-01-01')
-data = pd.merge(data,sqjt, how ='left',left_index=True, right_index=True)
-data.sort_index(inplace=True)
-candle_plot(data, "Market Data-600518")
-
-plt.show()
+# # 20180701 MACD line and Candle Pic.........................
+# data = ts.get_h_data("600519",start='2018-01-01') # 前复权
+# data = data.drop(['volume'],axis=1)
+# sqjt = ts.get_hist_data('600519',start = '2008-01-01')
+# data = pd.merge(data,sqjt, how ='left',left_index=True, right_index=True)
+# data.sort_index(inplace=True)
+# candle_plot(data, "Market Data-600518")
+# plt.show()
