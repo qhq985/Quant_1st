@@ -55,7 +55,7 @@ capital = 30000000
 # 起始日期，截止日期(默认今天)  'yyyy-mm-dd'
 start_date, end_date = '2017-12-29', today
 # 股票代码
-stock_list = ['513050.SH','169105.OF','600519.SH','002027.SZ','002415.SZ','600036.SH','0700.HK','2869.HK','1317.HK','1177.HK','0175.HK','AAPL.O','BABA.N','TAL.N','NTES.O']
+stock_list = ['600519.sh']
 # 股票起始总仓位 （默认：70%）
 start_position = 0.7
 # 股票权重方式： 1.等权（默认） 2.设定仓位百分比  3.设定股数  下面填 1 or 2 or 3
