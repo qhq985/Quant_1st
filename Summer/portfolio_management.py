@@ -213,6 +213,8 @@ future_list = ['RB.SHF','NI.SHF','SR.CZC','M.DCE']
 error_code,future_code = w.wsd(future_list, "trade_hiscode", future_date, end_date,usedf=True)
 future_code = future_code.drop_duplicates()
 future_code.index = future_code.index.strftime('%Y-%m-%d')
+# Extract the moth contact code of the first day
+future_code_month = list(future_code.iloc[0,:]) 
 print(future_code)
 
 # ###################################################################
@@ -258,31 +260,34 @@ future_start_price = list(future_price[future_price.index == start_future_date].
 future_percent = []
 future_shares = []
 future_weight = []
+future_name = w.wsd(future_list,'sec_name',end_date,end_date).Data[0]  
+future_contractmultiplier = w.wsd(future_code_month,'contractmultiplier',end_date,end_date).Data[0] 
+
 
 if future_method == 1:
     for i in range(len(future_list)):
         future_percent.append(1/len(future_list))
-        future_shares.append(int(capital*start_position_future/len(future_list)/future_start_price[i]))
-        future_weight.append(future_shares[i]*future_start_price[i])                             
+        future_shares.append(int(capital*start_position_future/len(future_list)/future_start_price[i]/future_contractmultiplier[i]))
+        future_weight.append(future_shares[i]*future_contractmultiplier[i]*future_start_price[i])                             
 elif future_method == 2:
     # 若选设定仓位，则填下面list的内容，注意总资金不能大于设定
     future_percent = [0.25,0.25,0.25,0.25]
     for i in range(len(future_list)):
         future_weight.append(future_percent[i]*capital*start_position_future)
-        future_shares.append(int(future_weight[i]/future_start_price[i]))
+        future_shares.append(int(future_weight[i]/future_start_price[i]/future_contractmultiplier[i]))
 elif future_method ==3:
     # 若选设定手数 ，则填下面list的内容，注意总资金不能大于设定 
     future_shares = [1,1,1,1]
     for i in range(len(future_list)):
-        future_weight.append(future_shares[i]*future_start_price[i])
+        future_weight.append(future_shares[i]*future_start_price[i]*future_contractmultiplier[i])
         future_percent.append(future_weight[i]/(capital*start_position_future))
                              
 assert sum(future_weight) <= capital*start_position_future, '总仓位数大于最大投入资金'                                
 assert sum(future_percent) <= 1, '总仓位比例大于1' 
 
-future_name = w.wsd(future_list,'sec_name',end_date,end_date).Data[0]   
-future_data_initial = pd.DataFrame(np.array([future_list,future_name,future_start_price,future_shares,future_weight,future_percent]),
-                                  index = ['商品期货代码','商品名称','起始价','手数','市值','仓位占比']).T                           
+ 
+future_data_initial = pd.DataFrame(np.array([future_list,future_name,future_start_price,future_shares,future_contractmultiplier,future_weight,future_percent]),
+                                  index = ['商品期货代码','商品名称','起始价','手数','合约乘数','市值','仓位占比']).T                           
 
 future_start_position_total = sum(future_weight)
 print('\n商品期货总览')
@@ -330,7 +335,7 @@ position_df['商品期货收益'] = position_df['商品期货收益'].where(inde
 position_df['组合总收益'] = position_df['股指对冲收益']+position_df['股票总收益']+position_df['商品期货收益']
 position_df['股票走势'] = position_df['股票总市值']/position_df[position_df['日期'] ==start_date].iloc[0,1]-1
 position_df['股指走势'] = index_df.iloc[:,1]/index_df[index_df['日期'] ==start_date].iloc[0,1]-1
-position_df['期货走势'] = future_df.iloc[:,1]/future_df[future_df['日期'] ==start_date].iloc[0,1]-1
+position_df['期货走势'] = position_df['商品期货收益']/capital
 position_df['组合投资回报率'] = position_df['组合总收益']/capital
 
 
