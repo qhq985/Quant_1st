@@ -1,2 +1,2 @@
 # Quant_1st
-This is our first time to try to do quantitative analysis
+THIS IS OUR FIRST TIME TO DO QUANTITATIVE ANALYSIS
